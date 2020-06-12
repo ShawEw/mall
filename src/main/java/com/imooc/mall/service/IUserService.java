@@ -14,5 +14,7 @@ public interface IUserService {
      * 注册
      * @param user
      */
-    ResponseVo register(User user);
+    ResponseVo<User> register(User user);
+
+    ResponseVo<User> login(String username, String passward);
 }
