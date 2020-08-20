@@ -1,6 +1,7 @@
 package com.imooc.mall.controller;
 
 import com.imooc.mall.consts.MallConst;
+import com.imooc.mall.enums.ResponseEnum;
 import com.imooc.mall.form.UserLoginForm;
 import com.imooc.mall.form.UserRegisterForm;
 import com.imooc.mall.pojo.User;
@@ -11,6 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import sun.rmi.runtime.Log;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -50,17 +52,26 @@ public class UserController {
 
         ResponseVo<User> responseVo = userService.login(userLoginForm.getUsername(), userLoginForm.getPassword());
         session.setAttribute(MallConst.CURRENT_USER, responseVo.getData());
+        log.info("/login sessionId={}", session.getId());
         return responseVo;
     }
 
+    //session 保存在内存中 改进版 token + redis
     @GetMapping("/user")
     public ResponseVo<User> userInfo(HttpSession session){
+        log.info("/login sessionId={}", session.getId());
         User user = (User) session.getAttribute(MallConst.CURRENT_USER);
-        if (user == null){
-            return ResponseVo.error(NEED_LOGIN);
-        }
         return ResponseVo.success(user);
     }
 
+    @PostMapping("/user/logout")
+    /**
+     * {@link org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory} getSessionTimeoutInMinutes
+     */
+    public ResponseVo logout(HttpSession session){
+        log.info("/user/logout sessionId={}",session.getId());
+        session.removeAttribute(MallConst.CURRENT_USER);
+        return ResponseVo.success();
+    }
 
 }
