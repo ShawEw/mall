@@ -3,9 +3,11 @@ package com.imooc.mall.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.imooc.mall.dao.ProductMapper;
+import com.imooc.mall.enums.ResponseEnum;
 import com.imooc.mall.pojo.Product;
 import com.imooc.mall.service.ICategoryService;
 import com.imooc.mall.service.IProductService;
+import com.imooc.mall.vo.ProductDetailVo;
 import com.imooc.mall.vo.ProductVo;
 import com.imooc.mall.vo.ResponseVo;
 import org.springframework.beans.BeanUtils;
@@ -16,6 +18,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.imooc.mall.enums.ProductStatus.DELETE;
+import static com.imooc.mall.enums.ProductStatus.OFF_SALE;
 
 /**
  * @author jiangjunhui
@@ -34,7 +39,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ResponseVo<PageInfo> list(Integer categoryId, Integer pageNum, Integer pageSize) {
         Set<Integer> categoryIdSet = new HashSet<>();
-        if (categoryId != null){
+        if (categoryId != null) {
             categoryService.findSubCategoryId(categoryId, categoryIdSet);
             categoryIdSet.add(categoryId);
         }
@@ -50,5 +55,16 @@ public class ProductServiceImpl implements IProductService {
         PageInfo pageInfo = new PageInfo(productList);
         pageInfo.setList(productVoList);
         return ResponseVo.success(pageInfo);
+    }
+
+    @Override
+    public ResponseVo<ProductDetailVo> detail(Integer productId) {
+        Product product = productMapper.selectByPrimaryKey(productId);
+        if (product.getStatus().equals(OFF_SALE) || product.getStatus().equals(DELETE)){
+            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
+        }
+        ProductDetailVo productDetailVo = new ProductDetailVo();
+        BeanUtils.copyProperties(product, productDetailVo);
+        return ResponseVo.success(productDetailVo);
     }
 }
