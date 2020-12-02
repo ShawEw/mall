@@ -56,4 +56,22 @@ class CartServiceImplTest{
         ResponseVo<CartVo> list = cartService.delete(1, 27);
         log.info("result={}", gson.toJson(list));
     }
+
+    @Test
+    public void selectAll(){
+        ResponseVo<CartVo> list = cartService.selectAll(1);
+        log.info("result={}", gson.toJson(list));
+    }
+
+    @Test
+    public void unSelectAll(){
+        ResponseVo<CartVo> list = cartService.unSelectAll(1);
+        log.info("result={}", gson.toJson(list));
+    }
+
+    @Test
+    public void sum(){
+        ResponseVo<Integer> responseVo = cartService.sum(1);
+        log.info("result={}", gson.toJson(responseVo));
+    }
 }
