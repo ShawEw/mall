@@ -5,6 +5,7 @@ import com.imooc.mall.dao.ProductMapper;
 import com.imooc.mall.enums.ProductStatus;
 import com.imooc.mall.enums.ResponseEnum;
 import com.imooc.mall.form.CartAddForm;
+import com.imooc.mall.form.CartUpdateForm;
 import com.imooc.mall.pojo.Cart;
 import com.imooc.mall.pojo.Product;
 import com.imooc.mall.service.ICartService;
@@ -51,7 +52,7 @@ public class CartServiceImpl implements ICartService {
         }
         //商品是否正常在售
         if (!product.getStatus().equals(ProductStatus.ON_SALE.getCode())) {
-            return  ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
+            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
         }
         //商品是否充足
         if (product.getStock() <= 0) {
@@ -62,10 +63,10 @@ public class CartServiceImpl implements ICartService {
         String redisKey = String.format(CART_REDIS_KEY_TEMPLATE, uid);
         Cart cart;
         String value = opsForHash.get(redisKey, String.valueOf(product.getId()));
-        if (StringUtils.isEmpty(value)){
+        if (StringUtils.isEmpty(value)) {
             //没有改商品
             cart = new Cart(product.getId(), quantity, cartAddForm.getSelected());
-        }else {
+        } else {
             //已经有了 数量+1
             cart = gson.fromJson(value, Cart.class);
             cart.setQuantity(cart.getQuantity() + quantity);
@@ -90,7 +91,7 @@ public class CartServiceImpl implements ICartService {
             Cart cart = gson.fromJson(entry.getValue(), Cart.class);
             // todo 不要在for循环中查询数据库 需要优化 使用mysql中的in
             Product product = productMapper.selectByPrimaryKey(productId);
-            if (product != null){
+            if (product != null) {
                 CartProductVo cartProductVo = new CartProductVo(productId,
                         cart.getQuantity(),
                         product.getName(),
@@ -103,11 +104,11 @@ public class CartServiceImpl implements ICartService {
                         cart.getProductSelected());
                 cartProductVoList.add(cartProductVo);
 
-                if (!cart.getProductSelected()){
+                if (!cart.getProductSelected()) {
                     selectAll = false;
                 }
                 //计算总价（只计算选中的）
-                if (cart.getProductSelected()){
+                if (cart.getProductSelected()) {
                     cartTotalPrice = cartTotalPrice.add(cartProductVo.getProductTotalPrice());
                 }
             }
@@ -120,5 +121,26 @@ public class CartServiceImpl implements ICartService {
         cartVo.setCartTotalPrice(cartTotalPrice);
         cartVo.setCartProductVoList(cartProductVoList);
         return ResponseVo.success(cartVo);
+    }
+
+    @Override
+    public ResponseVo<CartVo> update(Integer uid, Integer productId, CartUpdateForm form) {
+        HashOperations<String, String, String> opsForHash = stringRedisTemplate.opsForHash();
+        String redisKey = String.format(CART_REDIS_KEY_TEMPLATE, uid);
+        String value = opsForHash.get(redisKey, String.valueOf(productId));
+        if (StringUtils.isEmpty(value)) {
+            //没有改商品 报错
+            return ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
+        }
+        //已经有了 修改内容
+        Cart cart = gson.fromJson(value, Cart.class);
+        if (form.getQuantity() != null && form.getQuantity() >= 0) {
+            cart.setQuantity(form.getQuantity());
+        }
+        if (form.getSelected() != null) {
+            cart.setProductSelected(form.getSelected());
+        }
+        opsForHash.put(redisKey, String.valueOf(productId), gson.toJson(cart));
+        return list(uid);
     }
 }

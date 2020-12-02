@@ -3,6 +3,7 @@ package com.imooc.mall.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.imooc.mall.form.CartAddForm;
+import com.imooc.mall.form.CartUpdateForm;
 import com.imooc.mall.service.ICartService;
 import com.imooc.mall.vo.CartVo;
 import com.imooc.mall.vo.ResponseVo;
@@ -30,14 +31,23 @@ class CartServiceImplTest{
     @Test
     void add() {
         CartAddForm cartAddForm = new CartAddForm();
-        cartAddForm.setProductId(26);
+        cartAddForm.setProductId(27);
         cartAddForm.setSelected(true);
         cartService.add(1, cartAddForm);
     }
 
     @Test
-    public void test(){
+    public void list(){
         ResponseVo<CartVo> list = cartService.list(1);
+        log.info("list={}", gson.toJson(list));
+    }
+
+    @Test
+    public void update() {
+        CartUpdateForm cartUpdateForm = new CartUpdateForm();
+        cartUpdateForm.setQuantity(5);
+        cartUpdateForm.setSelected(false);
+        ResponseVo<CartVo> list = cartService.update(1, 26, cartUpdateForm);
         log.info("list={}", gson.toJson(list));
     }
 }
