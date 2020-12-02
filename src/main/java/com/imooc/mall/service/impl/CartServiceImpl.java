@@ -143,4 +143,17 @@ public class CartServiceImpl implements ICartService {
         opsForHash.put(redisKey, String.valueOf(productId), gson.toJson(cart));
         return list(uid);
     }
+
+    @Override
+    public ResponseVo<CartVo> delete(Integer uid, Integer productId) {
+        HashOperations<String, String, String> opsForHash = stringRedisTemplate.opsForHash();
+        String redisKey = String.format(CART_REDIS_KEY_TEMPLATE, uid);
+        String value = opsForHash.get(redisKey, String.valueOf(productId));
+        if (StringUtils.isEmpty(value)) {
+            //没有改商品 报错
+            return ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
+        }
+        opsForHash.delete(redisKey, String.valueOf(productId));
+        return list(uid);
+    }
 }

@@ -18,4 +18,6 @@ public interface ICartService {
     ResponseVo<CartVo> list(Integer uid);
 
     ResponseVo<CartVo> update(Integer uid, Integer productId, CartUpdateForm cartUpdateForm);
+
+    ResponseVo<CartVo> delete(Integer uid, Integer productId);
 }

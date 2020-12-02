@@ -48,6 +48,12 @@ class CartServiceImplTest{
         cartUpdateForm.setQuantity(5);
         cartUpdateForm.setSelected(false);
         ResponseVo<CartVo> list = cartService.update(1, 26, cartUpdateForm);
-        log.info("list={}", gson.toJson(list));
+        log.info("result={}", gson.toJson(list));
+    }
+
+    @Test
+    public void delete() {
+        ResponseVo<CartVo> list = cartService.delete(1, 27);
+        log.info("result={}", gson.toJson(list));
     }
 }
