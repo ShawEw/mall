@@ -1,33 +1,38 @@
-package com.imooc.mall.pojo;
+package com.imooc.mall.form;
 
 import lombok.Data;
 
-import java.util.Date;
+import javax.validation.constraints.NotBlank;
 
+/**
+ * @author jiangjunhui
+ * @description
+ * @date 2020/12/6上午9:40
+ */
 @Data
-public class Shipping {
-    private Integer id;
+public class ShippingForm {
 
-    private Integer userId;
-
+    @NotBlank
     private String receiverName;
 
+    @NotBlank
     private String receiverPhone;
 
+    @NotBlank
     private String receiverMobile;
 
+    @NotBlank
     private String receiverProvince;
 
+    @NotBlank
     private String receiverCity;
 
+    @NotBlank
     private String receiverDistrict;
 
+    @NotBlank
     private String receiverAddress;
 
+    @NotBlank
     private String receiverZip;
-
-    private Date createTime;
-
-    private Date updateTime;
-
 }

@@ -34,6 +34,8 @@ public enum ResponseEnum {
 
     CART_PRODUCT_NOT_EXIST(15, "购物车里商品不存在"),
 
+    DELETE_SHIPPING_FAIL(16, "删除地址失败"),
+
     ;
 
      Integer code;
